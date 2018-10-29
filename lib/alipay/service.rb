@@ -1,6 +1,7 @@
 module Alipay
   module Service
     GATEWAY_URL = 'https://mapi.alipay.com/gateway.do'
+    SANDBOX_GATEWAY_URL = 'https://openapi.alipaydev.com/gateway.do'
 
     CREATE_PARTNER_TRADE_BY_BUYER_REQUIRED_PARAMS = %w( out_trade_no subject logistics_type logistics_fee logistics_payment price quantity )
     # alipayescow
@@ -59,7 +60,7 @@ module Alipay
 
     CREATE_DIRECT_PAY_BY_USER_WAP_REQUIRED_PARAMS = %w( out_trade_no subject total_fee )
     # direct wap
-    def self.create_direct_pay_by_user_wap_url(params, options = {})
+    def self.create_direct_pay_by_user_wap_url(params, options = {}, sandbox = false)
       params = Utils.stringify_keys(params)
       check_required_params(params, CREATE_DIRECT_PAY_BY_USER_WAP_REQUIRED_PARAMS)
 
@@ -71,7 +72,7 @@ module Alipay
         'payment_type'   => '1'
       }.merge(params)
 
-      request_uri(params, options).to_s
+      request_uri(params, options, sandbox).to_s
     end
 
     CREATE_REFUND_URL_REQUIRED_PARAMS = %w( batch_no data notify_url )
@@ -179,8 +180,8 @@ module Alipay
       Net::HTTP.get(request_uri(params, options))
     end
 
-    def self.request_uri(params, options = {})
-      uri = URI(GATEWAY_URL)
+    def self.request_uri(params, options = {}, sandbox = false)
+      uri = URI(sandbox ? SANDBOX_GATEWAY_URL : GATEWAY_URL)
       uri.query = URI.encode_www_form(sign_params(params, options))
       uri
     end
