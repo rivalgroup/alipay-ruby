@@ -15,7 +15,7 @@ module Alipay
           'partner'        => options[:pid] || Alipay.pid,
           'seller_id'      => options[:pid] || Alipay.pid,
           'payment_type'   => '1'
-        }.merge(params)
+        }.merge(params).sort.to_h
 
         string = Alipay::Mobile::Sign.params_to_string(params)
         sign = CGI.escape(Alipay::Sign::RSA.sign(key, string))
